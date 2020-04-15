@@ -13,7 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:ui' as ui show Shader;
 import 'dart:math' show Point, Rectangle;
+import 'package:charts_flutter/src/util/monotonex.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_common/common.dart' as common show Color;
 
@@ -37,9 +39,11 @@ class LinePainter {
       Rectangle<num> clipBounds,
       common.Color fill,
       common.Color stroke,
+      bool smoothLine,
       bool roundEndCaps,
       double strokeWidthPx,
-      List<int> dashPattern}) {
+      List<int> dashPattern,
+      ui.Shader shader}) {
     if (points.isEmpty) {
       return;
     }
@@ -56,6 +60,9 @@ class LinePainter {
     }
 
     paint.color = new Color.fromARGB(stroke.a, stroke.r, stroke.g, stroke.b);
+    if (shader != null) {
+      paint.shader = shader;
+    }
 
     // If the line has a single point, draw a circle.
     if (points.length == 1) {
@@ -68,8 +75,9 @@ class LinePainter {
       }
       paint.strokeJoin = StrokeJoin.round;
       paint.style = PaintingStyle.stroke;
-
-      if (dashPattern == null || dashPattern.isEmpty) {
+      if (smoothLine ?? false) {
+        _drawSmoothLine(canvas, paint, points);
+      } else if (dashPattern == null || dashPattern.isEmpty) {
         if (roundEndCaps == true) {
           paint.strokeCap = StrokeCap.round;
         }
@@ -83,6 +91,14 @@ class LinePainter {
     if (clipBounds != null) {
       canvas.restore();
     }
+  }
+
+  /// Draws smooth lines between each point.
+  void _drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
+    final path = new Path()
+      ..moveTo(points.first.x.toDouble(), points.first.y.toDouble());
+    MonotoneX.addCurve(path, points);
+    canvas.drawPath(path, paint);
   }
 
   /// Draws solid lines between each point.

@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import '../../common/color.dart' show Color;
 import '../common/chart_canvas.dart' show getAnimatedColor, FillPatternType;
 import '../common/processed_series.dart' show ImmutableSeries;
-import '../../common/color.dart' show Color;
 
 abstract class BaseBarRendererElement {
   int barStackIndex;
@@ -29,17 +29,17 @@ abstract class BaseBarRendererElement {
   num measureOffsetPlusMeasure;
   double strokeWidthPx;
   bool measureIsNull;
+  bool measureIsNegative;
 
   BaseBarRendererElement();
 
   BaseBarRendererElement.clone(BaseBarRendererElement other) {
     barStackIndex = other.barStackIndex;
-    color =
-        other.color != null ? new Color.fromOther(color: other.color) : null;
+    color = other.color != null ? Color.fromOther(color: other.color) : null;
     cumulativeTotal = other.cumulativeTotal;
     dashPattern = other.dashPattern;
     fillColor = other.fillColor != null
-        ? new Color.fromOther(color: other.fillColor)
+        ? Color.fromOther(color: other.fillColor)
         : null;
     fillPattern = other.fillPattern;
     measureAxisPosition = other.measureAxisPosition;
@@ -47,6 +47,7 @@ abstract class BaseBarRendererElement {
     measureOffsetPlusMeasure = other.measureOffsetPlusMeasure;
     strokeWidthPx = other.strokeWidthPx;
     measureIsNull = other.measureIsNull;
+    measureIsNegative = other.measureIsNegative;
   }
 
   void updateAnimationPercent(BaseBarRendererElement previous,
@@ -55,6 +56,7 @@ abstract class BaseBarRendererElement {
     fillColor = getAnimatedColor(
         previous.fillColor, target.fillColor, animationPercent);
     measureIsNull = target.measureIsNull;
+    measureIsNegative = target.measureIsNegative;
   }
 }
 

@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import '../../../../common/date_time_factory.dart' show DateTimeFactory;
+import '../linear/linear_scale.dart' show LinearScale;
 import '../numeric_extents.dart' show NumericExtents;
-import 'date_time_extents.dart' show DateTimeExtents;
 import '../scale.dart'
     show MutableScale, StepSizeConfig, RangeBandConfig, ScaleOutputExtent;
-import '../linear/linear_scale.dart' show LinearScale;
-import '../../../../common/date_time_factory.dart' show DateTimeFactory;
+import 'date_time_extents.dart' show DateTimeExtents;
 
 /// [DateTimeScale] is a wrapper for [LinearScale].
 /// [DateTime] values are converted to millisecondsSinceEpoch and passed to the
@@ -27,7 +27,7 @@ class DateTimeScale extends MutableScale<DateTime> {
   final DateTimeFactory dateTimeFactory;
   final LinearScale _linearScale;
 
-  DateTimeScale(this.dateTimeFactory) : _linearScale = new LinearScale();
+  DateTimeScale(this.dateTimeFactory) : _linearScale = LinearScale();
 
   DateTimeScale._copy(DateTimeScale other)
       : dateTimeFactory = other.dateTimeFactory,
@@ -82,7 +82,7 @@ class DateTimeScale extends MutableScale<DateTime> {
 
   DateTimeExtents get viewportDomain {
     final extents = _linearScale.viewportDomain;
-    return new DateTimeExtents(
+    return DateTimeExtents(
         start: dateTimeFactory
             .createDateTimeFromMilliSecondsSinceEpoch(extents.min.toInt()),
         end: dateTimeFactory
@@ -90,13 +90,13 @@ class DateTimeScale extends MutableScale<DateTime> {
   }
 
   set viewportDomain(DateTimeExtents extents) {
-    _linearScale.viewportDomain = new NumericExtents(
+    _linearScale.viewportDomain = NumericExtents(
         extents.start.millisecondsSinceEpoch,
         extents.end.millisecondsSinceEpoch);
   }
 
   @override
-  DateTimeScale copy() => new DateTimeScale._copy(this);
+  DateTimeScale copy() => DateTimeScale._copy(this);
 
   @override
   double get viewportTranslatePx => _linearScale.viewportTranslatePx;

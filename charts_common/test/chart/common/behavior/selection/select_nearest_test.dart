@@ -65,7 +65,7 @@ void main() {
       {bool expandToDomain,
       bool selectClosestSeries,
       int maximumDomainDistancePx}) {
-    SelectNearest<String> behavior = new SelectNearest<String>(
+    SelectNearest<String> behavior = SelectNearest<String>(
         selectionModelType: selectionModelType,
         expandToDomain: expandToDomain,
         selectClosestSeries: selectClosestSeries,
@@ -77,7 +77,7 @@ void main() {
     return behavior;
   }
 
-  _setupChart(
+  void _setupChart(
       {Point<double> forPoint,
       bool isWithinRenderer,
       List<DatumDetails<String>> respondWithDetails,
@@ -95,10 +95,10 @@ void main() {
   }
 
   setUp(() {
-    _hoverSelectionModel = new MockSelectionModel();
-    _clickSelectionModel = new MockSelectionModel();
+    _hoverSelectionModel = MockSelectionModel();
+    _clickSelectionModel = MockSelectionModel();
 
-    _chart = new MockChart();
+    _chart = MockChart();
     when(_chart.getSelectionModel(SelectionModelType.info))
         .thenReturn(_hoverSelectionModel);
     when(_chart.getSelectionModel(SelectionModelType.action))
@@ -106,25 +106,25 @@ void main() {
 
     _series1Data = ['myDomain1', 'myDomain2', 'myDomain3'];
 
-    _series1 = new MutableSeries<String>(new Series(
+    _series1 = MutableSeries<String>(Series(
         id: 'mySeries1',
         data: ['myDatum1', 'myDatum2', 'myDatum3'],
-        domainFn: (dynamic, int i) => _series1Data[i],
+        domainFn: (_, int i) => _series1Data[i],
         measureFn: (_, __) {}));
 
-    _details1 = new DatumDetails(
+    _details1 = DatumDetails(
         datum: 'myDatum1',
         domain: 'myDomain1',
         series: _series1,
         domainDistance: 10.0,
         measureDistance: 20.0);
-    _details2 = new DatumDetails(
+    _details2 = DatumDetails(
         datum: 'myDatum2',
         domain: 'myDomain2',
         series: _series1,
         domainDistance: 10.0,
         measureDistance: 20.0);
-    _details3 = new DatumDetails(
+    _details3 = DatumDetails(
         datum: 'myDatum3',
         domain: 'myDomain3',
         series: _series1,
@@ -133,13 +133,13 @@ void main() {
 
     _series2Data = ['myDomain1'];
 
-    _series2 = new MutableSeries<String>(new Series(
+    _series2 = MutableSeries<String>(Series(
         id: 'mySeries2',
         data: ['myDatum1s2'],
-        domainFn: (dynamic, int i) => _series2Data[i],
+        domainFn: (_, int i) => _series2Data[i],
         measureFn: (_, __) {}));
 
-    _details1Series2 = new DatumDetails(
+    _details1Series2 = DatumDetails(
         datum: 'myDatum1s2',
         domain: 'myDomain1',
         series: _series2,
@@ -147,16 +147,14 @@ void main() {
         measureDistance: 20.0);
   });
 
-  tearDown(() {
-    resetMockitoState();
-  });
+  tearDown(resetMockitoState);
 
   group('SelectNearest trigger handling', () {
     test('single series selects detail', () {
       // Setup chart matches point with single domain single series.
       _makeBehavior(SelectionModelType.info, SelectionTrigger.hover,
           expandToDomain: true, selectClosestSeries: true);
-      Point<double> point = new Point(100.0, 100.0);
+      Point<double> point = Point(100.0, 100.0);
       _setupChart(
           forPoint: point,
           isWithinRenderer: true,
@@ -168,7 +166,7 @@ void main() {
 
       // Validate
       verify(_hoverSelectionModel.updateSelection(
-          [new SeriesDatum(_series1, _details1.datum)], [_series1]));
+          [SeriesDatum(_series1, _details1.datum)], [_series1]));
       verifyNoMoreInteractions(_hoverSelectionModel);
       verifyNoMoreInteractions(_clickSelectionModel);
       // Shouldn't be listening to anything else.
@@ -180,7 +178,7 @@ void main() {
       // Setup chart matches point with single domain single series.
       _makeBehavior(SelectionModelType.action, SelectionTrigger.tap,
           expandToDomain: true, selectClosestSeries: true);
-      Point<double> point = new Point(100.0, 100.0);
+      Point<double> point = Point(100.0, 100.0);
       _setupChart(
           forPoint: point,
           isWithinRenderer: true,
@@ -193,7 +191,7 @@ void main() {
 
       // Validate
       verify(_clickSelectionModel.updateSelection(
-          [new SeriesDatum(_series1, _details1.datum)], [_series1]));
+          [SeriesDatum(_series1, _details1.datum)], [_series1]));
       verifyNoMoreInteractions(_hoverSelectionModel);
       verifyNoMoreInteractions(_clickSelectionModel);
     });
@@ -203,28 +201,28 @@ void main() {
       _makeBehavior(SelectionModelType.info, SelectionTrigger.pressHold,
           expandToDomain: true, selectClosestSeries: true);
 
-      Point<double> startPoint = new Point(100.0, 100.0);
+      Point<double> startPoint = Point(100.0, 100.0);
       _setupChart(
           forPoint: startPoint,
           isWithinRenderer: true,
           respondWithDetails: [_details1],
           seriesList: [_series1]);
 
-      Point<double> updatePoint1 = new Point(200.0, 100.0);
+      Point<double> updatePoint1 = Point(200.0, 100.0);
       _setupChart(
           forPoint: updatePoint1,
           isWithinRenderer: true,
           respondWithDetails: [_details1],
           seriesList: [_series1]);
 
-      Point<double> updatePoint2 = new Point(300.0, 100.0);
+      Point<double> updatePoint2 = Point(300.0, 100.0);
       _setupChart(
           forPoint: updatePoint2,
           isWithinRenderer: true,
           respondWithDetails: [_details2],
           seriesList: [_series1]);
 
-      Point<double> endPoint = new Point(400.0, 100.0);
+      Point<double> endPoint = Point(400.0, 100.0);
       _setupChart(
           forPoint: endPoint,
           isWithinRenderer: true,
@@ -241,10 +239,10 @@ void main() {
       // Validate
       // details1 was tripped 2 times (startPoint & updatePoint1)
       verify(_hoverSelectionModel.updateSelection(
-          [new SeriesDatum(_series1, _details1.datum)], [_series1])).called(2);
+          [SeriesDatum(_series1, _details1.datum)], [_series1])).called(2);
       // details2 was tripped for updatePoint2
       verify(_hoverSelectionModel.updateSelection(
-          [new SeriesDatum(_series1, _details2.datum)], [_series1]));
+          [SeriesDatum(_series1, _details2.datum)], [_series1]));
       // dragEnd deselects even though we are over details3.
       verify(_hoverSelectionModel.updateSelection([], []));
       verifyNoMoreInteractions(_hoverSelectionModel);
@@ -256,21 +254,21 @@ void main() {
       _makeBehavior(SelectionModelType.info, SelectionTrigger.longPressHold,
           expandToDomain: true, selectClosestSeries: true);
 
-      Point<double> startPoint = new Point(100.0, 100.0);
+      Point<double> startPoint = Point(100.0, 100.0);
       _setupChart(
           forPoint: startPoint,
           isWithinRenderer: true,
           respondWithDetails: [_details1],
           seriesList: [_series1]);
 
-      Point<double> updatePoint1 = new Point(200.0, 100.0);
+      Point<double> updatePoint1 = Point(200.0, 100.0);
       _setupChart(
           forPoint: updatePoint1,
           isWithinRenderer: true,
           respondWithDetails: [_details2],
           seriesList: [_series1]);
 
-      Point<double> endPoint = new Point(400.0, 100.0);
+      Point<double> endPoint = Point(400.0, 100.0);
       _setupChart(
           forPoint: endPoint,
           isWithinRenderer: true,
@@ -292,9 +290,9 @@ void main() {
       // Validate
       // details1 was tripped 2 times (longPress & dragStart)
       verify(_hoverSelectionModel.updateSelection(
-          [new SeriesDatum(_series1, _details1.datum)], [_series1])).called(2);
+          [SeriesDatum(_series1, _details1.datum)], [_series1])).called(2);
       verify(_hoverSelectionModel.updateSelection(
-          [new SeriesDatum(_series1, _details2.datum)], [_series1]));
+          [SeriesDatum(_series1, _details2.datum)], [_series1]));
       // dragEnd deselects even though we are over details3.
       verify(_hoverSelectionModel.updateSelection([], []));
       verifyNoMoreInteractions(_hoverSelectionModel);
@@ -306,21 +304,21 @@ void main() {
       _makeBehavior(SelectionModelType.info, SelectionTrigger.longPressHold,
           expandToDomain: true, selectClosestSeries: true);
 
-      Point<double> startPoint = new Point(100.0, 100.0);
+      Point<double> startPoint = Point(100.0, 100.0);
       _setupChart(
           forPoint: startPoint,
           isWithinRenderer: true,
           respondWithDetails: [_details1],
           seriesList: [_series1]);
 
-      Point<double> updatePoint1 = new Point(200.0, 100.0);
+      Point<double> updatePoint1 = Point(200.0, 100.0);
       _setupChart(
           forPoint: updatePoint1,
           isWithinRenderer: true,
           respondWithDetails: [_details2],
           seriesList: [_series1]);
 
-      Point<double> endPoint = new Point(400.0, 100.0);
+      Point<double> endPoint = Point(400.0, 100.0);
       _setupChart(
           forPoint: endPoint,
           isWithinRenderer: true,
@@ -345,7 +343,7 @@ void main() {
       // Setup chart matches point with single domain single series.
       _makeBehavior(SelectionModelType.info, SelectionTrigger.hover,
           expandToDomain: true, selectClosestSeries: true);
-      Point<double> point = new Point(100.0, 100.0);
+      Point<double> point = Point(100.0, 100.0);
       _setupChart(forPoint: point, isWithinRenderer: true, respondWithDetails: [
         _details1,
         _details1Series2,
@@ -359,8 +357,8 @@ void main() {
 
       // Validate
       verify(_hoverSelectionModel.updateSelection([
-        new SeriesDatum(_series1, _details1.datum),
-        new SeriesDatum(_series2, _details1Series2.datum)
+        SeriesDatum(_series1, _details1.datum),
+        SeriesDatum(_series2, _details1Series2.datum)
       ], [
         _series1
       ]));
@@ -372,7 +370,7 @@ void main() {
       // Setup chart matches point with single domain single series.
       _makeBehavior(SelectionModelType.info, SelectionTrigger.hover,
           expandToDomain: false, selectClosestSeries: true);
-      Point<double> point = new Point(100.0, 100.0);
+      Point<double> point = Point(100.0, 100.0);
       _setupChart(forPoint: point, isWithinRenderer: true, respondWithDetails: [
         _details1,
         _details1Series2,
@@ -386,7 +384,7 @@ void main() {
 
       // Validate
       verify(_hoverSelectionModel.updateSelection(
-          [new SeriesDatum(_series1, _details1.datum)], [_series1]));
+          [SeriesDatum(_series1, _details1.datum)], [_series1]));
       verifyNoMoreInteractions(_hoverSelectionModel);
       verifyNoMoreInteractions(_clickSelectionModel);
     });
@@ -395,7 +393,7 @@ void main() {
       // Setup chart matches point with single domain single series.
       _makeBehavior(SelectionModelType.info, SelectionTrigger.hover,
           expandToDomain: true, selectClosestSeries: false);
-      Point<double> point = new Point(100.0, 100.0);
+      Point<double> point = Point(100.0, 100.0);
       _setupChart(forPoint: point, isWithinRenderer: true, respondWithDetails: [
         _details1,
         _details1Series2,
@@ -409,9 +407,37 @@ void main() {
 
       // Validate
       verify(_hoverSelectionModel.updateSelection([
-        new SeriesDatum(_series1, _details1.datum),
-        new SeriesDatum(_series2, _details1Series2.datum)
+        SeriesDatum(_series1, _details1.datum),
+        SeriesDatum(_series2, _details1Series2.datum)
       ], []));
+      verifyNoMoreInteractions(_hoverSelectionModel);
+      verifyNoMoreInteractions(_clickSelectionModel);
+    });
+
+    test('does not include overlay series', () {
+      // Setup chart with an overlay series.
+      _series2.overlaySeries = true;
+
+      _makeBehavior(SelectionModelType.info, SelectionTrigger.hover,
+          expandToDomain: true, selectClosestSeries: true);
+      Point<double> point = Point(100.0, 100.0);
+      _setupChart(forPoint: point, isWithinRenderer: true, respondWithDetails: [
+        _details1,
+        _details1Series2,
+      ], seriesList: [
+        _series1,
+        _series2
+      ]);
+
+      // Act
+      _chart.lastListener.onHover(point);
+
+      // Validate
+      verify(_hoverSelectionModel.updateSelection([
+        SeriesDatum(_series1, _details1.datum),
+      ], [
+        _series1
+      ]));
       verifyNoMoreInteractions(_hoverSelectionModel);
       verifyNoMoreInteractions(_clickSelectionModel);
     });
@@ -422,7 +448,7 @@ void main() {
           expandToDomain: true,
           selectClosestSeries: true,
           maximumDomainDistancePx: 1);
-      Point<double> point = new Point(100.0, 100.0);
+      Point<double> point = Point(100.0, 100.0);
       _setupChart(forPoint: point, isWithinRenderer: true, respondWithDetails: [
         _details1,
         _details1Series2,
@@ -447,7 +473,7 @@ void main() {
       SelectNearest behavior = _makeBehavior(
           SelectionModelType.info, SelectionTrigger.hover,
           expandToDomain: true, selectClosestSeries: true);
-      Point<double> point = new Point(100.0, 100.0);
+      Point<double> point = Point(100.0, 100.0);
       _setupChart(
           forPoint: point,
           isWithinRenderer: true,

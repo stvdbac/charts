@@ -18,7 +18,7 @@ import 'base_time_stepper.dart' show BaseTimeStepper;
 
 /// Month stepper.
 class MonthTimeStepper extends BaseTimeStepper {
-  static const _defaultIncrements = const [1, 2, 3, 4, 6, 12];
+  static const _defaultIncrements = [1, 2, 3, 4, 6, 12];
 
   final List<int> _allowedTickIncrements;
 
@@ -33,12 +33,11 @@ class MonthTimeStepper extends BaseTimeStepper {
     allowedTickIncrements ??= _defaultIncrements;
 
     // Must have at least one increment option.
-    assert(allowedTickIncrements.length > 0);
+    assert(allowedTickIncrements.isNotEmpty);
     // All increments must be > 0.
     assert(allowedTickIncrements.any((increment) => increment <= 0) == false);
 
-    return new MonthTimeStepper._internal(
-        dateTimeFactory, allowedTickIncrements);
+    return MonthTimeStepper._internal(dateTimeFactory, allowedTickIncrements);
   }
 
   @override
@@ -53,7 +52,12 @@ class MonthTimeStepper extends BaseTimeStepper {
   @override
   DateTime getStepTimeBeforeInclusive(DateTime time, int tickIncrement) {
     final monthRemainder = time.month % tickIncrement;
-    final newMonth = (time.month - monthRemainder) % DateTime.monthsPerYear;
+    var newMonth = (time.month - monthRemainder) % DateTime.monthsPerYear;
+    // Handles the last month of the year (December) edge case.
+    // Ex. When month is December and increment is 1
+    if (time.month == DateTime.monthsPerYear && newMonth == 0) {
+      newMonth = DateTime.monthsPerYear;
+    }
     final newYear =
         time.year - (monthRemainder / DateTime.monthsPerYear).floor();
 

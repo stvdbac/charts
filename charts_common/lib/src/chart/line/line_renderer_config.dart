@@ -14,9 +14,9 @@
 // limitations under the License.
 
 import '../../common/symbol_renderer.dart';
-import '../layout/layout_view.dart' show LayoutViewConfig, LayoutViewPaintOrder;
 import '../common/series_renderer_config.dart'
     show RendererAttributes, SeriesRendererConfig;
+import '../layout/layout_view.dart' show LayoutViewConfig, LayoutViewPaintOrder;
 import 'line_renderer.dart' show LineRenderer;
 
 /// Configuration for a line renderer.
@@ -26,7 +26,7 @@ class LineRendererConfig<D> extends LayoutViewConfig
 
   final SymbolRenderer symbolRenderer;
 
-  final rendererAttributes = new RendererAttributes();
+  final rendererAttributes = RendererAttributes();
 
   /// Radius of points on the line, if [includePoints] is enabled.
   final double radiusPx;
@@ -67,6 +67,9 @@ class LineRendererConfig<D> extends LayoutViewConfig
   /// Configures the opacity of the area skirt on the chart.
   final double areaOpacity;
 
+  /// Draw smooth line in Line Chart
+  final bool smoothLine;
+
   /// Whether lines should have round end caps, or square if false.
   final bool roundEndCaps;
 
@@ -74,20 +77,20 @@ class LineRendererConfig<D> extends LayoutViewConfig
       {this.customRendererId,
       this.radiusPx = 3.5,
       this.stacked = false,
-      double strokeWidthPx = 2.0,
+      this.strokeWidthPx = 2.0,
       this.dashPattern,
       this.includeLine = true,
       this.includePoints = false,
       this.includeArea = false,
       this.layoutPaintOrder = LayoutViewPaintOrder.line,
       this.areaOpacity = 0.1,
+      this.smoothLine = false,
       this.roundEndCaps = false,
       SymbolRenderer symbolRenderer})
-      : this.strokeWidthPx = strokeWidthPx,
-        this.symbolRenderer = symbolRenderer ?? new LineSymbolRenderer();
+      : this.symbolRenderer = symbolRenderer ?? LineSymbolRenderer();
 
   @override
   LineRenderer<D> build() {
-    return new LineRenderer<D>(config: this, rendererId: customRendererId);
+    return LineRenderer<D>(config: this, rendererId: customRendererId);
   }
 }

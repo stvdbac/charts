@@ -14,9 +14,9 @@
 // limitations under the License.
 
 import '../../common/symbol_renderer.dart';
-import '../layout/layout_view.dart' show LayoutViewConfig, LayoutViewPaintOrder;
 import '../common/series_renderer_config.dart'
     show RendererAttributes, SeriesRendererConfig;
+import '../layout/layout_view.dart' show LayoutViewConfig, LayoutViewPaintOrder;
 import 'point_renderer.dart' show PointRenderer, pointSymbolRendererIdKey;
 import 'point_renderer_decorator.dart' show PointRendererDecorator;
 
@@ -42,7 +42,7 @@ class PointRendererConfig<D> extends LayoutViewConfig
   /// [symbolRenderer].
   final Map<String, SymbolRenderer> customSymbolRenderers;
 
-  final rendererAttributes = new RendererAttributes();
+  final rendererAttributes = RendererAttributes();
 
   /// Default radius of the points, used if a series does not define a radiusPx
   /// accessor function.
@@ -75,6 +75,6 @@ class PointRendererConfig<D> extends LayoutViewConfig
 
   @override
   PointRenderer<D> build() {
-    return new PointRenderer<D>(config: this, rendererId: customRendererId);
+    return PointRenderer<D>(config: this, rendererId: customRendererId);
   }
 }

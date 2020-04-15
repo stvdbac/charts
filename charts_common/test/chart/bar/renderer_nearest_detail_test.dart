@@ -61,39 +61,41 @@ class MockDateTimeAxis extends Mock implements Axis<DateTime> {}
 class MockCanvas extends Mock implements ChartCanvas {}
 
 void main() {
-  final date0 = new DateTime(2018, 2, 1);
-  final date1 = new DateTime(2018, 2, 7);
-  final dateOutsideViewport = new DateTime(2018, 1, 1);
+  final date0 = DateTime(2018, 2, 1);
+  final date1 = DateTime(2018, 2, 7);
+  final dateOutsideViewport = DateTime(2018, 1, 1);
 
   /////////////////////////////////////////
   // Convenience methods for creating mocks.
   /////////////////////////////////////////
-  _configureBaseRenderer(BaseBarRenderer renderer, bool vertical) {
-    final context = new MockContext();
-    when(context.rtl).thenReturn(false);
-    final verticalChart = new MockChart();
+  BaseBarRenderer _configureBaseRenderer(
+      BaseBarRenderer renderer, bool vertical) {
+    final context = MockContext();
+    when(context.chartContainerIsRtl).thenReturn(false);
+    when(context.isRtl).thenReturn(false);
+    final verticalChart = MockChart();
     when(verticalChart.vertical).thenReturn(vertical);
     when(verticalChart.context).thenReturn(context);
     renderer.onAttach(verticalChart);
 
     final layoutBounds = vertical
-        ? new Rectangle<int>(70, 20, 230, 100)
-        : new Rectangle<int>(70, 20, 100, 230);
+        ? Rectangle<int>(70, 20, 230, 100)
+        : Rectangle<int>(70, 20, 100, 230);
     renderer.layout(layoutBounds, layoutBounds);
     return renderer;
   }
 
   BaseBarRenderer _makeBarRenderer({bool vertical, BarGroupingType groupType}) {
     final renderer =
-        new BarRenderer(config: new BarRendererConfig(groupingType: groupType));
+        BarRenderer(config: BarRendererConfig(groupingType: groupType));
     _configureBaseRenderer(renderer, vertical);
     return renderer;
   }
 
   BaseBarRenderer _makeBarTargetRenderer(
       {bool vertical, BarGroupingType groupType}) {
-    final renderer = new BarTargetLineRenderer(
-        config: new BarTargetLineRendererConfig(groupingType: groupType));
+    final renderer = BarTargetLineRenderer(
+        config: BarTargetLineRendererConfig(groupingType: groupType));
     _configureBaseRenderer(renderer, vertical);
     return renderer;
   }
@@ -101,11 +103,11 @@ void main() {
   MutableSeries _makeSeries(
       {String id, String seriesCategory, bool vertical = true}) {
     final data = <MyRow>[
-      new MyRow('camp0', 10),
-      new MyRow('camp1', 10),
+      MyRow('camp0', 10),
+      MyRow('camp1', 10),
     ];
 
-    final series = new MutableSeries<String>(new Series(
+    final series = MutableSeries<String>(Series(
       id: id,
       data: data,
       domainFn: (dynamic row, _) => row.campaign,
@@ -114,10 +116,10 @@ void main() {
     ));
 
     series.measureOffsetFn = (_) => 0.0;
-    series.colorFn = (_) => new Color.fromHex(code: '#000000');
+    series.colorFn = (_) => Color.fromHex(code: '#000000');
 
     // Mock the Domain axis results.
-    final domainAxis = new MockOrdinalAxis();
+    final domainAxis = MockOrdinalAxis();
     when(domainAxis.rangeBand).thenReturn(100.0);
     final domainOffset = vertical ? 70.0 : 20.0;
     when(domainAxis.getLocation('camp0'))
@@ -139,7 +141,7 @@ void main() {
     series.setAttr(domainAxisKey, domainAxis);
 
     // Mock the Measure axis results.
-    final measureAxis = new MockNumericAxis();
+    final measureAxis = MockNumericAxis();
     if (vertical) {
       when(measureAxis.getLocation(0.0)).thenReturn(20.0 + 100.0);
       when(measureAxis.getLocation(10.0)).thenReturn(20.0 + 100.0 - 10.0);
@@ -157,11 +159,11 @@ void main() {
   MutableSeries _makeDateTimeSeries(
       {String id, String seriesCategory, bool vertical = true}) {
     final data = <MyDateTimeRow>[
-      new MyDateTimeRow(date0, 10),
-      new MyDateTimeRow(date1, 10),
+      MyDateTimeRow(date0, 10),
+      MyDateTimeRow(date1, 10),
     ];
 
-    final series = new MutableSeries<DateTime>(new Series(
+    final series = MutableSeries<DateTime>(Series(
       id: id,
       data: data,
       domainFn: (dynamic row, _) => row.time,
@@ -170,10 +172,10 @@ void main() {
     ));
 
     series.measureOffsetFn = (_) => 0.0;
-    series.colorFn = (_) => new Color.fromHex(code: '#000000');
+    series.colorFn = (_) => Color.fromHex(code: '#000000');
 
     // Mock the Domain axis results.
-    final domainAxis = new MockDateTimeAxis();
+    final domainAxis = MockDateTimeAxis();
     when(domainAxis.rangeBand).thenReturn(100.0);
     final domainOffset = vertical ? 70.0 : 20.0;
     when(domainAxis.getLocation(date0)).thenReturn(domainOffset + 10.0 + 50.0);
@@ -184,7 +186,7 @@ void main() {
     series.setAttr(domainAxisKey, domainAxis);
 
     // Mock the Measure axis results.
-    final measureAxis = new MockNumericAxis();
+    final measureAxis = MockNumericAxis();
     if (vertical) {
       when(measureAxis.getLocation(0.0)).thenReturn(20.0 + 100.0);
       when(measureAxis.getLocation(10.0)).thenReturn(20.0 + 100.0 - 10.0);
@@ -220,11 +222,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -250,11 +252,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -273,11 +275,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -303,11 +305,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -328,11 +330,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -357,11 +359,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -394,11 +396,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -434,11 +436,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -483,13 +485,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 13.0, 20.0),
-          selectNearestByDomain,
-          null);
+          Point<double>(70.0 + 10.0 + 13.0, 20.0), selectNearestByDomain, null);
 
       // Verify
       expect(details.length, equals(1));
@@ -512,11 +512,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 50.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 50.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -543,19 +543,17 @@ void main() {
       final renderer =
           _makeBarRenderer(vertical: true, groupType: BarGroupingType.grouped);
       final seriesList = <MutableSeries>[
-        _makeSeries(id: 'foo')..data.add(new MyRow('outsideViewport', 20))
+        _makeSeries(id: 'foo')..data.add(MyRow('outsideViewport', 20))
       ];
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       // Note: point is in the axis, over a bar outside of the viewport.
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(65.0, 20.0 + 100.0 - 5.0),
-          selectNearestByDomain,
-          null);
+          Point<double>(65.0, 20.0 + 100.0 - 5.0), selectNearestByDomain, null);
 
       // Verify
       expect(details.length, equals(0));
@@ -576,11 +574,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 13.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 13.0),
           selectNearestByDomain,
           null);
 
@@ -605,11 +603,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -642,11 +640,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -681,11 +679,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -731,11 +729,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 100.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 100.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -760,11 +758,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 50.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 50.0),
           selectNearestByDomain,
           null);
 
@@ -799,13 +797,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 13.0, 20.0),
-          selectNearestByDomain,
-          null);
+          Point<double>(70.0 + 10.0 + 13.0, 20.0), selectNearestByDomain, null);
 
       // Verify
       expect(details.length, equals(1));
@@ -828,11 +824,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -865,11 +861,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -905,11 +901,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -957,11 +953,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 50.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 50.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -988,19 +984,17 @@ void main() {
       final renderer = _makeBarTargetRenderer(
           vertical: true, groupType: BarGroupingType.grouped);
       final seriesList = <MutableSeries>[
-        _makeSeries(id: 'foo')..data.add(new MyRow('outsideViewport', 20))
+        _makeSeries(id: 'foo')..data.add(MyRow('outsideViewport', 20))
       ];
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       // Note: point is in the axis, over a bar outside of the viewport.
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(65.0, 20.0 + 100.0 - 5.0),
-          selectNearestByDomain,
-          null);
+          Point<double>(65.0, 20.0 + 100.0 - 5.0), selectNearestByDomain, null);
 
       // Verify
       expect(details.length, equals(0));
@@ -1021,11 +1015,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 100.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 100.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -1050,11 +1044,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -1087,11 +1081,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -1126,11 +1120,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 20.0),
           selectNearestByDomain,
           null);
 
@@ -1177,11 +1171,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 5.0, 20.0 + 10.0 + 50.0),
+          Point<double>(70.0 + 5.0, 20.0 + 10.0 + 50.0),
           selectNearestByDomain,
           null);
 
@@ -1216,11 +1210,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -1245,11 +1239,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -1282,11 +1276,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 13.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -1322,11 +1316,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 20.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -1374,11 +1368,11 @@ void main() {
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(70.0 + 10.0 + 50.0, 20.0 + 100.0 - 5.0),
+          Point<double>(70.0 + 10.0 + 50.0, 20.0 + 100.0 - 5.0),
           selectNearestByDomain,
           null);
 
@@ -1406,19 +1400,17 @@ void main() {
           vertical: true, groupType: BarGroupingType.grouped);
       final seriesList = <MutableSeries>[
         _makeDateTimeSeries(id: 'foo')
-          ..data.add(new MyDateTimeRow(dateOutsideViewport, 20))
+          ..data.add(MyDateTimeRow(dateOutsideViewport, 20))
       ];
       renderer.configureSeries(seriesList);
       renderer.preprocessSeries(seriesList);
       renderer.update(seriesList, false);
-      renderer.paint(new MockCanvas(), 1.0);
+      renderer.paint(MockCanvas(), 1.0);
 
       // Act
       // Note: point is in the axis, over a bar outside of the viewport.
       final details = renderer.getNearestDatumDetailPerSeries(
-          new Point<double>(65.0, 20.0 + 100.0 - 5.0),
-          selectNearestByDomain,
-          null);
+          Point<double>(65.0, 20.0 + 100.0 - 5.0), selectNearestByDomain, null);
 
       // Verify
       expect(details.length, equals(0));

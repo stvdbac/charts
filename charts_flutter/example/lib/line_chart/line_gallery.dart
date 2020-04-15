@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:example/line_chart/smooth.dart';
 import 'package:flutter/material.dart';
 import '../gallery_scaffold.dart';
 import 'animation_zoom.dart';
@@ -26,6 +27,7 @@ import 'segments.dart';
 import 'simple.dart';
 import 'simple_nulls.dart';
 import 'stacked_area.dart';
+import 'stacked_area_custom_color.dart';
 import 'stacked_area_nulls.dart';
 
 List<GalleryScaffold> buildGallery() {
@@ -38,9 +40,21 @@ List<GalleryScaffold> buildGallery() {
     ),
     new GalleryScaffold(
       listTileIcon: new Icon(Icons.show_chart),
+      title: 'Smooth Line Chart',
+      subtitle: 'With a single series and smooth line and default line point highlighter',
+      childBuilder: () => new SmoothLineChart.withRandomData(),
+    ),
+    new GalleryScaffold(
+      listTileIcon: new Icon(Icons.show_chart),
       title: 'Stacked Area Chart',
       subtitle: 'Stacked area chart with three series',
       childBuilder: () => new StackedAreaLineChart.withRandomData(),
+    ),
+    new GalleryScaffold(
+      listTileIcon: new Icon(Icons.show_chart),
+      title: 'Stacked Area Custom Color Chart',
+      subtitle: 'Stacked area chart with custom area skirt color',
+      childBuilder: () => new StackedAreaCustomColorLineChart.withRandomData(),
     ),
     new GalleryScaffold(
       listTileIcon: new Icon(Icons.show_chart),

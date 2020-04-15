@@ -18,8 +18,8 @@ import 'dart:math' show Point;
 import 'package:meta/meta.dart' show protected;
 
 import '../../../../common/gesture_listener.dart' show GestureListener;
-import '../../../cartesian/cartesian_chart.dart' show CartesianChart;
 import '../../../cartesian/axis/axis.dart' show Axis;
+import '../../../cartesian/cartesian_chart.dart' show CartesianChart;
 import '../../base_chart.dart' show BaseChart;
 import '../chart_behavior.dart' show ChartBehavior;
 import 'panning_tick_provider.dart';
@@ -68,7 +68,7 @@ class PanBehavior<D> implements ChartBehavior<D> {
   }
 
   PanBehavior() {
-    _listener = new GestureListener(
+    _listener = GestureListener(
         onTapTest: onTapTest,
         onDragStart: onDragStart,
         onDragUpdate: onDragUpdate,
@@ -77,9 +77,9 @@ class PanBehavior<D> implements ChartBehavior<D> {
 
   /// Injects the behavior into a chart.
   @override
-  attachTo(BaseChart<D> chart) {
+  void attachTo(BaseChart<D> chart) {
     if (!(chart is CartesianChart)) {
-      throw new ArgumentError(
+      throw ArgumentError(
           'PanBehavior can only be attached to a CartesianChart');
     }
 
@@ -91,15 +91,15 @@ class PanBehavior<D> implements ChartBehavior<D> {
 
     // Wrap domain axis tick provider with the panning behavior one.
     _domainAxisTickProvider =
-        new PanningTickProvider<D>(_chart.domainAxis.tickProvider);
+        PanningTickProvider<D>(_chart.domainAxis.tickProvider);
     _chart.domainAxis.tickProvider = _domainAxisTickProvider;
   }
 
   /// Removes the behavior from a chart.
   @override
-  removeFrom(BaseChart<D> chart) {
+  void removeFrom(BaseChart<D> chart) {
     if (!(chart is CartesianChart)) {
-      throw new ArgumentError(
+      throw ArgumentError(
           'PanBehavior can only be attached to a CartesianChart');
     }
 
@@ -218,4 +218,4 @@ class PanBehavior<D> implements ChartBehavior<D> {
 }
 
 /// Callback for when panning is completed.
-typedef void PanningCompletedCallback();
+typedef PanningCompletedCallback = void Function();

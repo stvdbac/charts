@@ -14,11 +14,16 @@
 // limitations under the License.
 
 import 'dart:math' show Point, Rectangle;
-import 'canvas_shapes.dart' show CanvasBarStack, CanvasPie;
+
 import '../../common/color.dart' show Color;
+import '../../common/graphics_factory.dart' show GraphicsFactory;
 import '../../common/text_element.dart' show TextElement;
+import 'canvas_shapes.dart' show CanvasBarStack, CanvasPie;
 
 abstract class ChartCanvas {
+  /// Get [GraphicsFactory] for creating native graphics elements.
+  GraphicsFactory get graphicsFactory;
+
   /// Set the name of the view doing the rendering for debugging purposes,
   /// or null when we believe rendering is complete.
   set drawingView(String viewName);
@@ -52,6 +57,7 @@ abstract class ChartCanvas {
       Rectangle<num> clipBounds,
       Color fill,
       Color stroke,
+      bool smoothLine,
       bool roundEndCaps,
       double strokeWidthPx,
       List<int> dashPattern});
@@ -92,16 +98,29 @@ abstract class ChartCanvas {
       Rectangle<num> clipBounds,
       Color fill,
       Color stroke,
-      double strokeWidthPx});
+      double strokeWidthPx,
+      bool smoothLine});
 
   /// Renders a simple rectangle.
+  ///
+  /// [drawAreaBounds] if specified and if the bounds of the rectangle exceed
+  /// the draw area bounds on the top, the first x pixels (decided by the native
+  /// platform) exceeding the draw area will apply a gradient to transparent
+  /// with anything exceeding the x pixels to be transparent.
   void drawRect(Rectangle<num> bounds,
-      {Color fill, Color stroke, double strokeWidthPx});
+      {Color fill,
+      Color stroke,
+      double strokeWidthPx,
+      Rectangle<num> drawAreaBounds});
 
   /// Renders a rounded rectangle.
   void drawRRect(Rectangle<num> bounds,
       {Color fill,
       Color stroke,
+      Color patternColor,
+      FillPatternType fillPattern,
+      double patternStrokeWidthPx,
+      double strokeWidthPx,
       num radius,
       bool roundTopLeft,
       bool roundTopRight,
@@ -112,7 +131,13 @@ abstract class ChartCanvas {
   ///
   /// The first bar of the stack is expected to be the "base" bar. This would
   /// be the bottom most bar for a vertically rendered bar.
-  void drawBarStack(CanvasBarStack canvasBarStack);
+  ///
+  /// [drawAreaBounds] if specified and if the bounds of the rectangle exceed
+  /// the draw area bounds on the top, the first x pixels (decided by the native
+  /// platform) exceeding the draw area will apply a gradient to transparent
+  /// with anything exceeding the x pixels to be transparent.
+  void drawBarStack(CanvasBarStack canvasBarStack,
+      {Rectangle<num> drawAreaBounds});
 
   void drawText(TextElement textElement, int offsetX, int offsetY,
       {double rotation = 0.0});
@@ -132,7 +157,7 @@ Color getAnimatedColor(Color previous, Color target, double animationPercent) {
   var b = (((target.b - previous.b) * animationPercent) + previous.b).round();
   var a = (((target.a - previous.a) * animationPercent) + previous.a).round();
 
-  return new Color(a: a, r: r, g: g, b: b);
+  return Color(a: a, r: r, g: g, b: b);
 }
 
 /// Defines the pattern for a color fill.

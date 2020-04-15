@@ -48,7 +48,7 @@ class NumericAxisSpec extends AxisSpec<num> {
   /// [tickFormatterSpec] spec used to configure how the tick labels are
   ///     formatted.
   /// [showAxisLine] override to force the axis to draw the axis line.
-  NumericAxisSpec({
+  const NumericAxisSpec({
     RenderSpec<num> renderSpec,
     NumericTickProviderSpec tickProviderSpec,
     NumericTickFormatterSpec tickFormatterSpec,
@@ -68,7 +68,7 @@ class NumericAxisSpec extends AxisSpec<num> {
     bool showAxisLine,
     NumericExtents viewport,
   }) {
-    return new NumericAxisSpec(
+    return NumericAxisSpec(
       renderSpec: renderSpec ?? other.renderSpec,
       tickProviderSpec: tickProviderSpec ?? other.tickProviderSpec,
       tickFormatterSpec: tickFormatterSpec ?? other.tickFormatterSpec,
@@ -78,7 +78,7 @@ class NumericAxisSpec extends AxisSpec<num> {
   }
 
   @override
-  configure(
+  void configure(
       Axis<num> axis, ChartContext context, GraphicsFactory graphicsFactory) {
     super.configure(axis, context, graphicsFactory);
 
@@ -88,7 +88,7 @@ class NumericAxisSpec extends AxisSpec<num> {
   }
 
   @override
-  NumericAxis createAxis() => new NumericAxis();
+  NumericAxis createAxis() => NumericAxis();
 
   @override
   bool operator ==(Object other) =>
@@ -132,7 +132,7 @@ class BasicNumericTickProviderSpec implements NumericTickProviderSpec {
   /// [desiredMaxTickCount] automatically choose the best tick
   ///     count to produce the 'nicest' ticks but make sure we don't have more
   ///     than this many.
-  BasicNumericTickProviderSpec(
+  const BasicNumericTickProviderSpec(
       {this.zeroBound,
       this.dataIsInWholeNumbers,
       this.desiredTickCount,
@@ -141,7 +141,7 @@ class BasicNumericTickProviderSpec implements NumericTickProviderSpec {
 
   @override
   NumericTickProvider createTickProvider(ChartContext context) {
-    final provider = new NumericTickProvider();
+    final provider = NumericTickProvider();
     if (zeroBound != null) {
       provider.zeroBound = zeroBound;
     }
@@ -184,11 +184,11 @@ class BasicNumericTickProviderSpec implements NumericTickProviderSpec {
 class NumericEndPointsTickProviderSpec implements NumericTickProviderSpec {
   /// Creates a [TickProviderSpec] that dynamically chooses numeric ticks at the
   /// two end points of the axis range
-  NumericEndPointsTickProviderSpec();
+  const NumericEndPointsTickProviderSpec();
 
   @override
   EndPointsTickProvider<num> createTickProvider(ChartContext context) {
-    return new EndPointsTickProvider<num>();
+    return EndPointsTickProvider<num>();
   }
 
   @override
@@ -200,15 +200,16 @@ class NumericEndPointsTickProviderSpec implements NumericTickProviderSpec {
 class StaticNumericTickProviderSpec implements NumericTickProviderSpec {
   final List<TickSpec<num>> tickSpecs;
 
-  StaticNumericTickProviderSpec(this.tickSpecs);
+  const StaticNumericTickProviderSpec(this.tickSpecs);
 
   @override
   StaticTickProvider<num> createTickProvider(ChartContext context) =>
-      new StaticTickProvider<num>(tickSpecs);
+      StaticTickProvider<num>(tickSpecs);
 
   @override
   bool operator ==(Object other) =>
-      other is StaticNumericTickProviderSpec && tickSpecs == other.tickSpecs;
+      identical(this, other) ||
+      (other is StaticNumericTickProviderSpec && tickSpecs == other.tickSpecs);
 
   @override
   int get hashCode => tickSpecs.hashCode;
@@ -221,9 +222,9 @@ class BasicNumericTickFormatterSpec implements NumericTickFormatterSpec {
 
   /// Simple [TickFormatterSpec] that delegates formatting to the given
   /// [NumberFormat].
-  BasicNumericTickFormatterSpec(this.formatter) : numberFormat = null;
+  const BasicNumericTickFormatterSpec(this.formatter) : numberFormat = null;
 
-  BasicNumericTickFormatterSpec.fromNumberFormat(this.numberFormat)
+  const BasicNumericTickFormatterSpec.fromNumberFormat(this.numberFormat)
       : formatter = null;
 
   /// A formatter will be created with the number format if it is not null.
@@ -231,15 +232,16 @@ class BasicNumericTickFormatterSpec implements NumericTickFormatterSpec {
   @override
   NumericTickFormatter createTickFormatter(ChartContext context) {
     return numberFormat != null
-        ? new NumericTickFormatter.fromNumberFormat(numberFormat)
-        : new NumericTickFormatter(formatter: formatter);
+        ? NumericTickFormatter.fromNumberFormat(numberFormat)
+        : NumericTickFormatter(formatter: formatter);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is BasicNumericTickFormatterSpec &&
-        formatter == other.formatter &&
-        numberFormat == other.numberFormat;
+    return identical(this, other) ||
+        (other is BasicNumericTickFormatterSpec &&
+            formatter == other.formatter &&
+            numberFormat == other.numberFormat);
   }
 
   @override

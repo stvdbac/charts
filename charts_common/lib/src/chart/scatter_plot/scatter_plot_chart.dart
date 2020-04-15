@@ -15,15 +15,13 @@
 
 import 'dart:collection' show LinkedHashMap;
 
-import 'point_renderer.dart' show PointRenderer;
 import '../cartesian/axis/axis.dart' show NumericAxis;
 import '../cartesian/axis/draw_strategy/gridline_draw_strategy.dart'
     show GridlineRendererSpec;
 import '../cartesian/cartesian_chart.dart' show NumericCartesianChart;
-import '../common/chart_context.dart' show ChartContext;
 import '../common/series_renderer.dart' show SeriesRenderer;
 import '../layout/layout_config.dart' show LayoutConfig;
-import '../../common/graphics_factory.dart' show GraphicsFactory;
+import 'point_renderer.dart' show PointRenderer;
 
 /// A scatter plot draws series data as a collection of points in a two
 /// dimensional Cartesian space, plotting two variables from each datum at a
@@ -57,13 +55,12 @@ class ScatterPlotChart extends NumericCartesianChart {
 
   @override
   SeriesRenderer<num> makeDefaultRenderer() {
-    return new PointRenderer<num>()
-      ..rendererId = SeriesRenderer.defaultRendererId;
+    return PointRenderer<num>()..rendererId = SeriesRenderer.defaultRendererId;
   }
 
   @override
-  void initDomainAxis(ChartContext context, GraphicsFactory graphicsFactory) {
-    domainAxis.tickDrawStrategy = new GridlineRendererSpec<num>()
+  void initDomainAxis() {
+    domainAxis.tickDrawStrategy = GridlineRendererSpec<num>()
         .createDrawStrategy(context, graphicsFactory);
   }
 }

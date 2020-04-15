@@ -13,12 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:meta/meta.dart' show required;
 import 'dart:math' show Point, Rectangle, max;
-import 'layout_view.dart' show LayoutView, LayoutPosition;
+
+import 'package:meta/meta.dart' show required;
+
 import 'layout_config.dart' show LayoutConfig;
 import 'layout_manager.dart';
 import 'layout_margin_strategy.dart';
+import 'layout_view.dart' show LayoutView, LayoutPosition;
 
 /// Default Layout manager for [LayoutView]s.
 class LayoutManagerImpl implements LayoutManager {
@@ -51,7 +53,7 @@ class LayoutManagerImpl implements LayoutManager {
 
   /// Create a new [LayoutManager].
   LayoutManagerImpl({LayoutConfig config})
-      : this.config = config ?? new LayoutConfig();
+      : this.config = config ?? LayoutConfig();
 
   /// Add one [LayoutView].
   void addView(LayoutView view) {
@@ -77,7 +79,7 @@ class LayoutManagerImpl implements LayoutManager {
   @override
   List<LayoutView> get paintOrderedViews {
     if (_viewsNeedPaintSort) {
-      _paintOrderedViews = new List<LayoutView>.from(_views);
+      _paintOrderedViews = List<LayoutView>.from(_views);
 
       _paintOrderedViews.sort((LayoutView v1, LayoutView v2) =>
           v1.layoutConfig.paintOrder.compareTo(v2.layoutConfig.paintOrder));
@@ -91,7 +93,7 @@ class LayoutManagerImpl implements LayoutManager {
   @override
   List<LayoutView> get positionOrderedViews {
     if (_viewsNeedPositionSort) {
-      _positionOrderedViews = new List<LayoutView>.from(_views);
+      _positionOrderedViews = List<LayoutView>.from(_views);
 
       _positionOrderedViews.sort((LayoutView v1, LayoutView v2) => v1
           .layoutConfig.positionOrder
@@ -115,10 +117,16 @@ class LayoutManagerImpl implements LayoutManager {
     final drawableViews =
         _views.where((LayoutView view) => view.isSeriesRenderer);
 
-    var componentBounds = drawableViews.first.componentBounds;
+    var componentBounds = drawableViews?.first?.componentBounds;
 
-    for (LayoutView view in drawableViews.skip(1)) {
-      componentBounds = componentBounds.boundingBox(view.componentBounds);
+    if (componentBounds != null) {
+      for (LayoutView view in drawableViews.skip(1)) {
+        if (view.componentBounds != null) {
+          componentBounds = componentBounds.boundingBox(view.componentBounds);
+        }
+      }
+    } else {
+      componentBounds = Rectangle(0, 0, 0, 0);
     }
 
     return componentBounds;
@@ -149,7 +157,7 @@ class LayoutManagerImpl implements LayoutManager {
   }
 
   @override
-  withinDrawArea(Point<num> point) {
+  bool withinDrawArea(Point<num> point) {
     return _drawAreaBounds.containsPoint(point);
   }
 
@@ -218,8 +226,8 @@ class LayoutManagerImpl implements LayoutManager {
     );
 
     // Bounds for the draw area.
-    _drawAreaBounds = new Rectangle(measurements.leftWidth,
-        measurements.topHeight, drawAreaWidth, drawAreaHeight);
+    _drawAreaBounds = Rectangle(measurements.leftWidth, measurements.topHeight,
+        drawAreaWidth, drawAreaHeight);
     _drawAreaBoundsOutdated = false;
   }
 
@@ -235,16 +243,16 @@ class LayoutManagerImpl implements LayoutManager {
         _viewsForPositions(LayoutPosition.Left, LayoutPosition.FullLeft);
     var drawAreaViews = _viewsForPositions(LayoutPosition.DrawArea);
 
-    final fullBounds = new Rectangle(0, 0, width, height);
+    final fullBounds = Rectangle(0, 0, width, height);
 
     // Layout the margins.
-    new LeftMarginLayoutStrategy()
+    LeftMarginLayoutStrategy()
         .layout(leftViews, _measurements.leftSizes, fullBounds, drawAreaBounds);
-    new RightMarginLayoutStrategy().layout(
+    RightMarginLayoutStrategy().layout(
         rightViews, _measurements.rightSizes, fullBounds, drawAreaBounds);
-    new BottomMarginLayoutStrategy().layout(
+    BottomMarginLayoutStrategy().layout(
         bottomViews, _measurements.bottomSizes, fullBounds, drawAreaBounds);
-    new TopMarginLayoutStrategy()
+    TopMarginLayoutStrategy()
         .layout(topViews, _measurements.topSizes, fullBounds, drawAreaBounds);
 
     // Layout the drawArea.
@@ -289,14 +297,14 @@ class LayoutManagerImpl implements LayoutManager {
         ? height - bottomHeight - topHeight
         : height;
 
-    var leftSizes = new LeftMarginLayoutStrategy().measure(leftViews,
+    var leftSizes = LeftMarginLayoutStrategy().measure(leftViews,
         maxWidth: useMax ? maxLeftWidth : leftWidth,
         height: adjustedHeight,
         fullHeight: height);
 
     leftWidth = max(leftSizes.total, config.leftSpec.getMinPixels(width));
 
-    var rightSizes = new RightMarginLayoutStrategy().measure(rightViews,
+    var rightSizes = RightMarginLayoutStrategy().measure(rightViews,
         maxWidth: useMax ? maxRightWidth : rightWidth,
         height: adjustedHeight,
         fullHeight: height);
@@ -304,20 +312,20 @@ class LayoutManagerImpl implements LayoutManager {
 
     final adjustedWidth = width - leftWidth - rightWidth;
 
-    var bottomSizes = new BottomMarginLayoutStrategy().measure(bottomViews,
+    var bottomSizes = BottomMarginLayoutStrategy().measure(bottomViews,
         maxHeight: useMax ? maxBottomHeight : bottomHeight,
         width: adjustedWidth,
         fullWidth: width);
     bottomHeight =
         max(bottomSizes.total, config.bottomSpec.getMinPixels(height));
 
-    var topSizes = new TopMarginLayoutStrategy().measure(topViews,
+    var topSizes = TopMarginLayoutStrategy().measure(topViews,
         maxHeight: useMax ? maxTopHeight : topHeight,
         width: adjustedWidth,
         fullWidth: width);
     topHeight = max(topSizes.total, config.topSpec.getMinPixels(height));
 
-    return new _MeasuredSizes(
+    return _MeasuredSizes(
         leftWidth: leftWidth,
         leftSizes: leftSizes,
         rightWidth: rightWidth,
@@ -329,7 +337,7 @@ class LayoutManagerImpl implements LayoutManager {
   }
 
   @override
-  void applyToViews(void apply(LayoutView view)) {
+  void applyToViews(void Function(LayoutView view) apply) {
     _views.forEach((view) => apply(view));
   }
 }

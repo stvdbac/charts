@@ -14,8 +14,9 @@
 // limitations under the License.
 
 import 'dart:math' show Rectangle, min, max, Point;
-import 'chart_canvas.dart' show FillPatternType;
+
 import '../../common/color.dart' show Color;
+import 'chart_canvas.dart' show FillPatternType;
 
 /// A rectangle to be painted by [ChartCanvas].
 class CanvasRect {
@@ -71,9 +72,9 @@ class CanvasBarStack {
 
     final width = right - left;
     final height = bottom - top;
-    final fullStackRect = new Rectangle(left, top, width, height);
+    final fullStackRect = Rectangle(left, top, width, height);
 
-    return new CanvasBarStack._internal(
+    return CanvasBarStack._internal(
       segments,
       radius: radius,
       stackedBarPadding: stackedBarPadding,

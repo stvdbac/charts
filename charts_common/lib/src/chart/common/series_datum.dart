@@ -19,13 +19,18 @@ import 'processed_series.dart' show ImmutableSeries;
 class SeriesDatum<D> {
   final ImmutableSeries<D> series;
   final dynamic datum;
+
+  /// This is set after [index] getter is called. So accessing this directly is
+  /// considered unsafe. Always uses [index] getter instead.
   int _index;
 
-  SeriesDatum(this.series, this.datum) {
-    _index = datum == null ? null : series.data.indexOf(datum);
-  }
+  SeriesDatum(this.series, this.datum);
 
-  int get index => _index;
+  int get index {
+    if (datum == null) return null;
+    _index ??= series.data.indexOf(datum);
+    return _index;
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -43,10 +48,10 @@ class SeriesDatumConfig<D> {
   SeriesDatumConfig(this.seriesId, this.domainValue);
 
   @override
-  bool operator ==(Object o) {
-    return o is SeriesDatumConfig &&
-        seriesId == o.seriesId &&
-        domainValue == o.domainValue;
+  bool operator ==(Object other) {
+    return other is SeriesDatumConfig &&
+        seriesId == other.seriesId &&
+        domainValue == other.domainValue;
   }
 
   @override

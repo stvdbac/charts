@@ -18,12 +18,12 @@ import 'package:meta/meta.dart' show required;
 import '../../../../common/graphics_factory.dart' show GraphicsFactory;
 import '../../../common/chart_context.dart' show ChartContext;
 import '../axis.dart' show AxisOrientation;
-import '../numeric_scale.dart' show NumericScale;
 import '../draw_strategy/tick_draw_strategy.dart' show TickDrawStrategy;
+import '../numeric_scale.dart' show NumericScale;
+import '../numeric_tick_provider.dart' show NumericTickProvider;
 import '../tick.dart' show Tick;
 import '../tick_formatter.dart' show SimpleTickFormatterBase, TickFormatter;
 import '../tick_provider.dart' show TickHint;
-import '../numeric_tick_provider.dart' show NumericTickProvider;
 
 /// Tick provider that generates ticks for a [BucketingNumericAxis].
 ///
@@ -72,7 +72,7 @@ class BucketingNumericTickProvider extends NumericTickProvider {
     @required Map<num, String> formatterValueCache,
     @required TickDrawStrategy tickDrawStrategy,
     @required AxisOrientation orientation,
-    bool viewportExtensionEnabled: false,
+    bool viewportExtensionEnabled = false,
     TickHint<num> tickHint,
   }) {
     if (_threshold == null) {
@@ -83,7 +83,7 @@ class BucketingNumericTickProvider extends NumericTickProvider {
       throw ('The showBucket flag must be set before getting ticks.');
     }
 
-    final localFormatter = new _BucketingFormatter()
+    final localFormatter = _BucketingFormatter()
       ..threshold = _threshold
       ..originalFormatter = formatter;
 
@@ -100,7 +100,7 @@ class BucketingNumericTickProvider extends NumericTickProvider {
     assert(scale != null);
 
     // Create a tick for the threshold.
-    final thresholdTick = new Tick<num>(
+    final thresholdTick = Tick<num>(
         value: _threshold,
         textElement: graphicsFactory
             .createTextElement(localFormatter.formatValue(_threshold)),

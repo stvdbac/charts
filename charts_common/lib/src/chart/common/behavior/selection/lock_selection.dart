@@ -15,11 +15,11 @@
 
 import 'dart:math';
 
-import 'selection_trigger.dart' show SelectionTrigger;
+import '../../../../common/gesture_listener.dart' show GestureListener;
 import '../../base_chart.dart' show BaseChart;
 import '../../behavior/chart_behavior.dart' show ChartBehavior;
 import '../../selection_model/selection_model.dart' show SelectionModelType;
-import '../../../../common/gesture_listener.dart' show GestureListener;
+import 'selection_trigger.dart' show SelectionTrigger;
 
 /// Chart behavior that listens to tap event trigges and locks the specified
 /// [SelectionModel]. This is used to prevent further updates to the selection
@@ -45,14 +45,13 @@ class LockSelection<D> implements ChartBehavior<D> {
 
   LockSelection({this.selectionModelType = SelectionModelType.info}) {
     // Setup the appropriate gesture listening.
-    switch (this.eventTrigger) {
+    switch (eventTrigger) {
       case SelectionTrigger.tap:
-        _listener =
-            new GestureListener(onTapTest: _onTapTest, onTap: _onSelect);
+        _listener = GestureListener(onTapTest: _onTapTest, onTap: _onSelect);
         break;
       default:
-        throw new ArgumentError('LockSelection does not support the event ' +
-            'trigger "${this.eventTrigger}"');
+        throw ArgumentError('LockSelection does not support the event '
+            'trigger "$eventTrigger"');
         break;
     }
   }
@@ -99,11 +98,26 @@ class LockSelection<D> implements ChartBehavior<D> {
   void attachTo(BaseChart<D> chart) {
     _chart = chart;
     chart.addGestureListener(_listener);
+
+    // TODO: Update this dynamically based on tappable location.
+    switch (eventTrigger) {
+      case SelectionTrigger.tap:
+      case SelectionTrigger.tapAndDrag:
+      case SelectionTrigger.pressHold:
+      case SelectionTrigger.longPressHold:
+        chart.registerTappable(this);
+        break;
+      case SelectionTrigger.hover:
+      default:
+        chart.unregisterTappable(this);
+        break;
+    }
   }
 
   @override
   void removeFrom(BaseChart<D> chart) {
     chart.removeGestureListener(_listener);
+    chart.unregisterTappable(this);
     _chart = null;
   }
 

@@ -17,10 +17,11 @@ import 'dart:math' show Point;
 
 import '../../common/color.dart' show Color;
 import '../../common/symbol_renderer.dart' show SymbolRenderer;
+import 'chart_canvas.dart' show FillPatternType;
 import 'processed_series.dart' show ImmutableSeries;
 
-typedef String DomainFormatter<D>(D domain);
-typedef String MeasureFormatter(num measure);
+typedef DomainFormatter<D> = String Function(D domain);
+typedef MeasureFormatter = String Function(num measure);
 
 /// Represents processed rendering details for a data point from a series.
 class DatumDetails<D> {
@@ -80,6 +81,19 @@ class DatumDetails<D> {
   /// Otherwise, [color] will be used for the fill color.
   final Color fillColor;
 
+  /// Optional fill pattern of this [datum].
+  final FillPatternType fillPattern;
+
+  /// Optional area color of this [datum].
+  ///
+  /// This color is used for supplemental information on the series, such as
+  /// confidence intervals or area skirts. If not provided, then some variation
+  /// of the main [color] will be used (e.g. 10% opacity).
+  final Color areaColor;
+
+  /// Optional dash pattern of this [datum].
+  final List<int> dashPattern;
+
   /// The chart position of the (domain, measure) for the [datum] from a
   /// renderer.
   final Point<double> chartPosition;
@@ -123,9 +137,11 @@ class DatumDetails<D> {
       {this.datum,
       this.index,
       this.domain,
+      this.domainFormatter,
       this.domainLowerBound,
       this.domainUpperBound,
       this.measure,
+      this.measureFormatter,
       this.measureLowerBound,
       this.measureUpperBound,
       this.measureOffset,
@@ -135,6 +151,9 @@ class DatumDetails<D> {
       this.series,
       this.color,
       this.fillColor,
+      this.fillPattern,
+      this.areaColor,
+      this.dashPattern,
       this.chartPosition,
       this.chartPositionLower,
       this.chartPositionUpper,
@@ -152,6 +171,7 @@ class DatumDetails<D> {
       D domainLowerBound,
       D domainUpperBound,
       num measure,
+      MeasureFormatter measureFormatter,
       num measureLowerBound,
       num measureUpperBound,
       num measureOffset,
@@ -161,21 +181,27 @@ class DatumDetails<D> {
       ImmutableSeries<D> series,
       Color color,
       Color fillColor,
+      FillPatternType fillPattern,
+      Color areaColor,
+      List<int> dashPattern,
       Point<double> chartPosition,
       Point<double> chartPositionLower,
       Point<double> chartPositionUpper,
+      DomainFormatter domainFormatter,
       double domainDistance,
       double measureDistance,
       double radiusPx,
       SymbolRenderer symbolRenderer,
       double strokeWidthPx}) {
-    return new DatumDetails<D>(
+    return DatumDetails<D>(
         datum: datum ?? other.datum,
         index: index ?? other.index,
         domain: domain ?? other.domain,
+        domainFormatter: domainFormatter ?? other.domainFormatter,
         domainLowerBound: domainLowerBound ?? other.domainLowerBound,
         domainUpperBound: domainUpperBound ?? other.domainUpperBound,
         measure: measure ?? other.measure,
+        measureFormatter: measureFormatter ?? other.measureFormatter,
         measureLowerBound: measureLowerBound ?? other.measureLowerBound,
         measureUpperBound: measureUpperBound ?? other.measureUpperBound,
         measureOffset: measureOffset ?? other.measureOffset,
@@ -187,6 +213,9 @@ class DatumDetails<D> {
         series: series ?? other.series,
         color: color ?? other.color,
         fillColor: fillColor ?? other.fillColor,
+        fillPattern: fillPattern ?? other.fillPattern,
+        areaColor: areaColor ?? other.areaColor,
+        dashPattern: dashPattern ?? other.dashPattern,
         chartPosition: chartPosition ?? other.chartPosition,
         chartPositionLower: chartPositionLower ?? other.chartPositionLower,
         chartPositionUpper: chartPositionUpper ?? other.chartPositionUpper,
