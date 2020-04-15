@@ -26,7 +26,7 @@ class LineRendererConfig<D> extends LayoutViewConfig
 
   final SymbolRenderer symbolRenderer;
 
-  final rendererAttributes = new RendererAttributes();
+  final rendererAttributes = RendererAttributes();
 
   /// Radius of points on the line, if [includePoints] is enabled.
   final double radiusPx;
@@ -87,10 +87,10 @@ class LineRendererConfig<D> extends LayoutViewConfig
       this.smoothLine = false,
       this.roundEndCaps = false,
       SymbolRenderer symbolRenderer})
-      : this.symbolRenderer = symbolRenderer ?? new LineSymbolRenderer();
+      : this.symbolRenderer = symbolRenderer ?? LineSymbolRenderer();
 
   @override
   LineRenderer<D> build() {
-    return new LineRenderer<D>(config: this, rendererId: customRendererId);
+    return LineRenderer<D>(config: this, rendererId: customRendererId);
   }
 }
