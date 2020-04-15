@@ -1,3 +1,23 @@
+Fork of flutter_charts
+https://github.com/stvdbac/charts
+to add smooth lines
+
+use:
+```
+git pull https://github.com/google/charts.git master
+git push
+```
+to merge changes from charts.
+
+in pubspec.yaml use
+```
+  charts_flutter:
+    git:
+      url: git://github.com/stvdbac/charts.git
+      path: charts_flutter
+```
+
+
 Charts is a general charting library, currently enabled for the
 [Flutter mobile UI framework](https://flutter.io).
 
